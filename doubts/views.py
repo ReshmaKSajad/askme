@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.views.generic import TemplateView,CreateView,FormView
+from django.views.generic import TemplateView,CreateView,FormView,ListView
 from doubts.forms import RegistrationForm,LoginForm,QuestionForm
 from doubts.models import MyUser, Questions
 from django.urls import reverse_lazy
@@ -7,11 +7,19 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 
 
-class IndexView(CreateView):
+class IndexView(CreateView,ListView):
     template_name = "home.html"
     form_class = QuestionForm
     model = Questions
     success_url = reverse_lazy("index")
+    context_object_name="questions"
+
+    def get_queryset(self):
+         return Questions.objects.all().exclude(user=self.request.user)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 class SignupView(CreateView):
     model = MyUser

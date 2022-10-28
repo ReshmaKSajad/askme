@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from doubts.views import IndexView,SignupView,LoginView
+from doubts.views import IndexView,SignupView,LoginView,QuestionDetailView,add_answer
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('index',IndexView.as_view(),name = "index"),
     path('register',SignupView.as_view(),name='register'),
-    path('',LoginView.as_view(),name='signin')
-   
+    path('',LoginView.as_view(),name='signin'),
+    path("questions/<int:id>/detail",QuestionDetailView.as_view(),name = "detail"),
+    path("questions/<int:id>/answer",add_answer,name="answer")
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

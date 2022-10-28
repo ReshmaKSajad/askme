@@ -1,0 +1,29 @@
+{%extends 'base.html'%}
+{%block body_block%}
+<div class="container">
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <div class="card mb-4">
+                {%if question.image%}
+                <a href="#!"><img class="card-img-top" src="{{question.image.url}}" alt="..." /></a>
+                {%endif%}
+                <div class="card-body">
+                    <div class="small text-muted">{{question.created_date}}</div>
+                    <h6 class="card-title h4">{{question.user}}</h6>
+                    <h2 class="card-title h4">{{question.question}}</h2>
+                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis aliquid atque, nulla.</p>
+
+                    <form action="{%url 'answer' question.id%}" method="post">
+                        {%csrf_token%}
+                        <textarea name="answer" id="" cols="30" rows="3"></textarea>
+                        <input type="submit" value="Add your Answer here" class="btn-btn-primary">
+                    </form>
+                    <a class="btn btn-primary" href="#!">Read more →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-4"></div>
+    </div>
+</div>
+{%endblock%}

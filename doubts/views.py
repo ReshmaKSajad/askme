@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
-from django.views.generic import TemplateView,CreateView,FormView,ListView
+from django.views.generic import TemplateView,CreateView,FormView,ListView,DetailView
 from doubts.forms import RegistrationForm,LoginForm,QuestionForm
-from doubts.models import MyUser, Questions
+from doubts.models import MyUser, Questions,Answers
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
@@ -44,4 +44,18 @@ class LoginView(FormView):
                     messages.error(request,"invalid credentials")
                     return render(request,self.template_name,{"form":form})
 
+class QuestionDetailView(DetailView):
+    model = Questions
+    template_name = "question-detail.html"
+    pk_url_kwarg = "id"
+    context_object_name = "question"
+
+def add_answer(request,*args,**kwargs):
+    qid = kwargs.get("id")
+    question = Questions.objects.get(id=qid)
+    answer = request.POST.get("answer")
+    Answers.objects.create(user = request.user,answer = answer,question = question)
+    #question.answers_set.create(user = request.user, answer = answer)
+    return redirect("index")
     
+                           

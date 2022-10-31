@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User,AbstractUser
+from django.db.models import Count
+
 
 class MyUser(AbstractUser):
     phone = models.CharField(max_length=200)
@@ -12,6 +14,11 @@ class Questions(models.Model):
     image = models.ImageField(null=True,upload_to="Q-images",blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default = True)
+
+    @property
+    def fetch_answers(self):
+        answers = self.answers_set.all().annotate(u_count = Count('upvote')).order_by('-u_count')
+        return answers
 
     def __str__(self):
         return self.question

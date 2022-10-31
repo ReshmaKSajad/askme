@@ -1,4 +1,3 @@
-from socket import fromshare
 from django import forms
 from doubts.models import MyUser
 from django.contrib.auth.forms import UserCreationForm

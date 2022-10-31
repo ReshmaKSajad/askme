@@ -58,4 +58,10 @@ def add_answer(request,*args,**kwargs):
     #question.answers_set.create(user = request.user, answer = answer)
     return redirect("index")
     
+def upvote_view(request,*args,**kwargs):
+    ans_id = kwargs.get("id")
+    ans = Answers.objects.get(id=ans_id)
+    ans.upvote.add(request.user)
+    ans.save()
+    return redirect("index")
                            

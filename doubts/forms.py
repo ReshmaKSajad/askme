@@ -21,3 +21,6 @@ class QuestionForm(forms.ModelForm):
             "question":forms.Textarea(attrs={"class":"form-control","rows":3}),
             "image":forms.FileInput(attrs={"class":"form-select"})
         }
+
+class AnswerForm(forms.Form):
+    answer = forms.CharField(widget=forms.Textarea(attrs={"class":"form-control"}))

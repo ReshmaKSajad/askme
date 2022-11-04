@@ -16,7 +16,7 @@
 
                     <form action="{%url 'answer' question.id%}" method="post">
                         {%csrf_token%}
-                        <textarea name="answer" id="" cols="30" rows="3"></textarea>
+                        {{form.as_p}}
                         <input type="submit" value="Add your Answer here" class="btn-btn-primary">
                     </form>
                     
@@ -35,6 +35,9 @@
                                 <h2 class="card-title-h4">{{ans.answer}}</h2>
                                 <div class="small-text-muted">replied on {{ans.posted_date}} by {{ans.user}}</div>
                                 
+                                {%if ans.user == request.user%}
+                                <a href="{%url 'remove' ans.id%}" class="btn btn-sm btn-outline-danger">REMOVE</a>
+                                {%endif%}
                             </li>
                             {%endfor%}
                         </ul>

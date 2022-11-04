@@ -1,10 +1,22 @@
+from ast import For
 from django.shortcuts import render,redirect
-from django.views.generic import TemplateView,CreateView,FormView,ListView,DetailView
-from doubts.forms import RegistrationForm,LoginForm,QuestionForm
+from django.views.generic import TemplateView,CreateView,FormView,ListView,DetailView,DeleteView
+from doubts.forms import RegistrationForm,LoginForm,QuestionForm,AnswerForm
 from doubts.models import MyUser, Questions,Answers
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
+from django.utils.decorators import method_decorator
+
+
+def signin_reqiured(fn):
+    def wrapper(request,*args,**kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request,"You must login")
+            return redirect("signin")
+        else:
+            return fn(request,*args,**kwargs)
+    return wrapper
 
 
 class IndexView(CreateView,ListView):
@@ -44,24 +56,45 @@ class LoginView(FormView):
                     messages.error(request,"invalid credentials")
                     return render(request,self.template_name,{"form":form})
 
-class QuestionDetailView(DetailView):
+
+class QuestionDetailView(DetailView,FormView):
     model = Questions
     template_name = "question-detail.html"
     pk_url_kwarg = "id"
     context_object_name = "question"
+    form_class = AnswerForm
+
 
 def add_answer(request,*args,**kwargs):
-    qid = kwargs.get("id")
-    question = Questions.objects.get(id=qid)
-    answer = request.POST.get("answer")
-    Answers.objects.create(user = request.user,answer = answer,question = question)
-    #question.answers_set.create(user = request.user, answer = answer)
-    return redirect("index")
-    
+    if request.method=="POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.cleaned_data.get("answer")
+            qid = kwargs.get("id")
+            ques = Questions.objects.get(id=qid)
+            Answers.objects.create(question=ques,user = request.user,answer=answer)
+            return redirect("index")
+
+        else:
+            return redirect("index")
+
+
+
 def upvote_view(request,*args,**kwargs):
     ans_id = kwargs.get("id")
     ans = Answers.objects.get(id=ans_id)
     ans.upvote.add(request.user)
     ans.save()
     return redirect("index")
+
+
+def signout_view(request,*args,**kwargs):
+    logout(request)
+    return redirect("register")
+
+def remove_view(request,*args,**kwargs):
+    ans_id = kwargs.get("id")
+    Answers.objects.get(id = ans_id).delete()
+    return redirect("index")
+    
                            

@@ -7,18 +7,19 @@ from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.utils.decorators import method_decorator
-
+from django.views.decorators.cache import never_cache
 
 def signin_reqiured(fn):
     def wrapper(request,*args,**kwargs):
         if not request.user.is_authenticated:
-            messages.error(request,"You must login")
             return redirect("signin")
         else:
             return fn(request,*args,**kwargs)
     return wrapper
 
+decs=[signin_reqiured,never_cache]
 
+@method_decorator(decs,name="dispatch")
 class IndexView(CreateView,ListView):
     template_name = "home.html"
     form_class = QuestionForm
@@ -56,7 +57,7 @@ class LoginView(FormView):
                     messages.error(request,"invalid credentials")
                     return render(request,self.template_name,{"form":form})
 
-
+@method_decorator(decs,name="dispatch")
 class QuestionDetailView(DetailView,FormView):
     model = Questions
     template_name = "question-detail.html"
@@ -64,7 +65,7 @@ class QuestionDetailView(DetailView,FormView):
     context_object_name = "question"
     form_class = AnswerForm
 
-
+decs
 def add_answer(request,*args,**kwargs):
     if request.method=="POST":
         form = AnswerForm(request.POST)
@@ -79,7 +80,7 @@ def add_answer(request,*args,**kwargs):
             return redirect("index")
 
 
-
+decs
 def upvote_view(request,*args,**kwargs):
     ans_id = kwargs.get("id")
     ans = Answers.objects.get(id=ans_id)
@@ -87,11 +88,12 @@ def upvote_view(request,*args,**kwargs):
     ans.save()
     return redirect("index")
 
-
+decs
 def signout_view(request,*args,**kwargs):
     logout(request)
-    return redirect("register")
+    return redirect("signin")
 
+decs
 def remove_view(request,*args,**kwargs):
     ans_id = kwargs.get("id")
     Answers.objects.get(id = ans_id).delete()
